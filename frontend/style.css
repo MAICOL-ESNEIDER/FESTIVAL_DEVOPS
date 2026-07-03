@@ -116,6 +116,37 @@ body {
   transform: translateY(-3px);
 }
 
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.ticket-card {
+  background: #334155;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.ticket-card h3 {
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.ticket-price {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #22c55e;
+  margin-bottom: 8px;
+}
+
+.ticket-card .ticket-button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+}
+
 footer {
   text-align: center;
   padding: 20px;
