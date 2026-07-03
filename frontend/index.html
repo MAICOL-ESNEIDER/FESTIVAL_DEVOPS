@@ -37,6 +37,13 @@
     </section>
 
     <section class="card">
+      <h2>Tickets</h2>
+      <div id="tickets-grid" class="tickets-grid">
+        <p>Cargando boletería...</p>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>¿Por qué asistir?</h2>
       <p>
         Porque el Pacific DevOps Music Fest combina música en vivo, networking,
@@ -89,8 +96,37 @@
       }
     }
 
+    function formatCOP(value) {
+      return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+    }
+
+    async function loadTickets() {
+      const ticketsGrid = document.getElementById('tickets-grid');
+      try {
+        const response = await fetch('http://localhost:5000/api/tickets');
+        const data = await response.json();
+
+        ticketsGrid.innerHTML = '';
+        data.tickets.forEach(ticket => {
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.innerHTML = `
+            <h3>${ticket.name}</h3>
+            <p class="ticket-price">${formatCOP(ticket.price)}</p>
+            <p>${ticket.benefits}</p>
+            <a class="ticket-button" href="https://www.tuboleta.com/" target="_blank" rel="noopener noreferrer">Comprar</a>
+          `;
+          ticketsGrid.appendChild(card);
+        });
+      } catch (error) {
+        ticketsGrid.innerHTML = '<p>No se pudo cargar la boletería.</p>';
+        console.error('Error:', error);
+      }
+    }
+
     loadConcertData();
     loadArtists();
+    loadTickets();
   </script>
 </body>
 </html>

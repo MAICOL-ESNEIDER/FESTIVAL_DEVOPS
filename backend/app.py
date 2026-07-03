@@ -69,6 +69,18 @@ def init_db():
 
     raise Exception("No fue posible conectar a MySQL después de varios intentos.")
 
+TICKET_TYPES = [
+    {"id": 1, "name": "General", "price": 80000, "benefits": "Acceso general al festival"},
+    {"id": 2, "name": "VIP", "price": 150000, "benefits": "Zona VIP + merchandising oficial"},
+    {"id": 3, "name": "Backstage", "price": 250000, "benefits": "Acceso backstage + meet & greet"}
+]
+
+
+@app.route("/api/tickets", methods=["GET"])
+def get_tickets():
+    return jsonify({"tickets": TICKET_TYPES})
+
+
 @app.route("/api/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok", "message": "Backend funcionando correctamente"})
