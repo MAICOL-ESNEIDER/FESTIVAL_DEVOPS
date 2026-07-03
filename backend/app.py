@@ -1,0 +1,104 @@
+import os
+import time
+from flask import Flask, jsonify
+from flask_cors import CORS
+import mysql.connector
+from mysql.connector import Error
+
+app = Flask(__name__)
+CORS(app)
+
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_PORT = int(os.getenv("DB_PORT", "3306"))
+DB_NAME = os.getenv("DB_NAME", "festivaldb")
+DB_USER = os.getenv("DB_USER", "festivaluser")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "festivalpass")
+APP_PORT = int(os.getenv("APP_PORT", "5000"))
+
+def get_connection():
+    return mysql.connector.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME
+    )
+
+def init_db():
+    retries = 20
+    while retries > 0:
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS concert_info (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    date VARCHAR(100) NOT NULL,
+                    location VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    artists TEXT NOT NULL
+                )
+            """)
+
+            cursor.execute("SELECT COUNT(*) FROM concert_info")
+            count = cursor.fetchone()[0]
+
+            if count == 0:
+                cursor.execute("""
+                    INSERT INTO concert_info (name, date, location, description, artists)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    "Pacific DevOps Music Fest",
+                    "20 de julio de 2026",
+                    "Medellín, Colombia",
+                    "Festival que reúne música en vivo, innovación tecnológica y cultura DevOps.",
+                    "DJ Container, Flask Beats, MySQL Groove, The Compose Band"
+                ))
+                connection.commit()
+
+            cursor.close()
+            connection.close()
+            print("Base de datos inicializada correctamente.")
+            return
+        except Error as e:
+            print(f"Esperando a MySQL... Error: {e}")
+            retries -= 1
+            time.sleep(5)
+
+    raise Exception("No fue posible conectar a MySQL después de varios intentos.")
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok", "message": "Backend funcionando correctamente"})
+
+@app.route("/api/concert", methods=["GET"])
+def get_concert():
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM concert_info ORDER BY id DESC LIMIT 1")
+        concert = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if concert:
+            artists = [artist.strip() for artist in concert["artists"].split(",")]
+            return jsonify({
+                "id": concert["id"],
+                "name": concert["name"],
+                "date": concert["date"],
+                "location": concert["location"],
+                "description": concert["description"],
+                "artists": artists
+            })
+
+        return jsonify({"error": "No hay información del concierto"}), 404
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    init_db()
+    app.run(host="0.0.0.0", port=APP_PORT, debug=False)
