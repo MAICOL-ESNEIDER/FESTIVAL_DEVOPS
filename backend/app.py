@@ -1,6 +1,6 @@
 import os
 import time
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
 from mysql.connector import Error
@@ -130,6 +130,20 @@ def get_concert():
         return jsonify({"error": "No hay información del concierto"}), 404
     except Error as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/api/contact", methods=["POST"])
+def post_contact():
+    data = request.get_json(silent=True) or {}
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+    message = data.get("message", "").strip()
+
+    if not name or not email or not message:
+        return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
+
+    print(f"[CONTACTO] {name} <{email}>: {message}")
+    return jsonify({"status": "ok", "message": "Gracias por tu mensaje, te contactaremos pronto."})
+
 
 if __name__ == "__main__":
     init_db()
