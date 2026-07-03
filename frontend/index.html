@@ -50,6 +50,25 @@
         innovación y experiencias inolvidables para la comunidad tech.
       </p>
     </section>
+    <section class="card">
+      <h2>Contacto</h2>
+      <form id="contact-form" class="contact-form">
+        <div class="form-group">
+          <label for="contact-name">Nombre</label>
+          <input type="text" id="contact-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Correo</label>
+          <input type="email" id="contact-email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="contact-message">Mensaje</label>
+          <textarea id="contact-message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Enviar mensaje</button>
+        <p id="contact-feedback" class="form-message"></p>
+      </form>
+    </section>
   </main>
 
   <footer>
@@ -127,6 +146,39 @@
     loadConcertData();
     loadArtists();
     loadTickets();
+
+    const contactForm = document.getElementById('contact-form');
+    const contactFeedback = document.getElementById('contact-feedback');
+
+    contactForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        name: document.getElementById('contact-name').value,
+        email: document.getElementById('contact-email').value,
+        message: document.getElementById('contact-message').value
+      };
+
+      try {
+        const response = await fetch('http://localhost:5000/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        contactFeedback.textContent = result.message;
+        contactFeedback.classList.toggle('form-message-error', result.status !== 'ok');
+
+        if (result.status === 'ok') {
+          contactForm.reset();
+        }
+      } catch (error) {
+        contactFeedback.textContent = 'No se pudo enviar el mensaje. Intenta de nuevo.';
+        contactFeedback.classList.add('form-message-error');
+        console.error('Error:', error);
+      }
+    });
   </script>
 </body>
 </html>

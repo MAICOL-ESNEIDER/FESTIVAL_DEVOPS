@@ -147,6 +147,66 @@ body {
   font-size: 0.95rem;
 }
 
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 500px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.form-group input,
+.form-group textarea {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #f8fafc;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+.btn-submit {
+  align-self: flex-start;
+  background: #ec4899;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #db2777;
+}
+
+.form-message {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.form-message-error {
+  color: #f87171;
+}
+
 footer {
   text-align: center;
   padding: 20px;
