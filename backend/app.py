@@ -73,6 +73,26 @@ def init_db():
 def health():
     return jsonify({"status": "ok", "message": "Backend funcionando correctamente"})
 
+@app.route("/api/artists", methods=["GET"])
+def get_artists():
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT artists FROM concert_info ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if not row:
+            return jsonify({"artists": []})
+
+        artists_raw = [a.strip() for a in row["artists"].split(",")]
+        artists = [{"id": idx + 1, "name": name} for idx, name in enumerate(artists_raw)]
+        return jsonify({"artists": artists})
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/api/concert", methods=["GET"])
 def get_concert():
     try:

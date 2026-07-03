@@ -31,9 +31,9 @@
 
     <section class="card">
       <h2>Artistas Invitados</h2>
-      <ul id="artists-list">
-        <li>Cargando artistas...</li>
-      </ul>
+      <div id="artists-grid" class="artists-grid">
+        <p>Cargando artistas...</p>
+      </div>
     </section>
 
     <section class="card">
@@ -56,7 +56,6 @@
         const data = await response.json();
 
         const eventInfo = document.getElementById('event-info');
-        const artistsList = document.getElementById('artists-list');
 
         eventInfo.innerHTML = `
           <p><strong>Nombre:</strong> ${data.name}</p>
@@ -64,23 +63,34 @@
           <p><strong>Lugar:</strong> ${data.location}</p>
           <p><strong>Descripción:</strong> ${data.description}</p>
         `;
-
-        artistsList.innerHTML = '';
-        data.artists.forEach(artist => {
-          const li = document.createElement('li');
-          li.textContent = artist;
-          artistsList.appendChild(li);
-        });
       } catch (error) {
         document.getElementById('event-info').innerHTML =
           '<p>Error cargando la información de la API.</p>';
-        document.getElementById('artists-list').innerHTML =
-          '<li>No se pudieron cargar los artistas.</li>';
+        console.error('Error:', error);
+      }
+    }
+
+    async function loadArtists() {
+      const artistsGrid = document.getElementById('artists-grid');
+      try {
+        const response = await fetch('http://localhost:5000/api/artists');
+        const data = await response.json();
+
+        artistsGrid.innerHTML = '';
+        data.artists.forEach(artist => {
+          const card = document.createElement('div');
+          card.className = 'artist-card';
+          card.textContent = artist.name;
+          artistsGrid.appendChild(card);
+        });
+      } catch (error) {
+        artistsGrid.innerHTML = '<p>No se pudieron cargar los artistas.</p>';
         console.error('Error:', error);
       }
     }
 
     loadConcertData();
+    loadArtists();
   </script>
 </body>
 </html>
