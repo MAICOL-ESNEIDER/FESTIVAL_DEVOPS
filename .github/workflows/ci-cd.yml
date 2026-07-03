@@ -1,0 +1,29 @@
+﻿name: CI - Build y Validacion
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Preparar variables de entorno de prueba
+        run: cp .env.example .env
+
+      - name: Validar sintaxis de Python (backend)
+        run: python3 -m py_compile backend/app.py
+
+      - name: Construir imagen Docker del backend
+        run: docker build -t festival-backend:ci ./backend
+
+      - name: Construir imagen Docker del frontend
+        run: docker build -t festival-frontend:ci ./frontend
+
+      - name: Validar docker-compose.yml
+        run: docker compose config
