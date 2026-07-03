@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacific DevOps Music Fest</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <p class="badge">Festival Tecnológico & Musical</p>
+      <h1>Pacific DevOps Music Fest</h1>
+      <p class="subtitle">
+        Vive una experiencia única con música, tecnología y cultura DevOps.
+      </p>
+      <a class="ticket-button" href="https://www.tuboleta.com/" target="_blank" rel="noopener noreferrer">
+        Comprar Tickets
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Información del Evento</h2>
+      <div id="event-info">
+        <p>Cargando información del concierto...</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Artistas Invitados</h2>
+      <ul id="artists-list">
+        <li>Cargando artistas...</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>¿Por qué asistir?</h2>
+      <p>
+        Porque el Pacific DevOps Music Fest combina música en vivo, networking,
+        innovación y experiencias inolvidables para la comunidad tech.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Pacific DevOps Music Fest - Landing desplegada con Docker Compose</p>
+  </footer>
+
+  <script>
+    async function loadConcertData() {
+      try {
+        const response = await fetch('http://localhost:5000/api/concert');
+        const data = await response.json();
+
+        const eventInfo = document.getElementById('event-info');
+        const artistsList = document.getElementById('artists-list');
+
+        eventInfo.innerHTML = `
+          <p><strong>Nombre:</strong> ${data.name}</p>
+          <p><strong>Fecha:</strong> ${data.date}</p>
+          <p><strong>Lugar:</strong> ${data.location}</p>
+          <p><strong>Descripción:</strong> ${data.description}</p>
+        `;
+
+        artistsList.innerHTML = '';
+        data.artists.forEach(artist => {
+          const li = document.createElement('li');
+          li.textContent = artist;
+          artistsList.appendChild(li);
+        });
+      } catch (error) {
+        document.getElementById('event-info').innerHTML =
+          '<p>Error cargando la información de la API.</p>';
+        document.getElementById('artists-list').innerHTML =
+          '<li>No se pudieron cargar los artistas.</li>';
+        console.error('Error:', error);
+      }
+    }
+
+    loadConcertData();
+  </script>
+</body>
+</html>
